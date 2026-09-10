@@ -182,7 +182,7 @@ button:hover {
 </head>
 
 <body>
-
+<audio id="music" src="Rex_Orange_County_-_Best_Friend__Official_Audio_(480p).mp4" loop></audio>
 <!-- START -->
 <section class="screen active" id="start">
     <div class="card">
@@ -190,7 +190,7 @@ button:hover {
         <h1>Hey Kashish 💗</h1>
         <p>A tiny little game made especially for you.</p>
         <p class="small">No boring website. Just tap things. 😭</p>
-        <button onclick="go('hearts')">START ✨</button>
+   <button onclick="startMusic(); go('hearts')">START ✨</button> 
     </div>
 </section>
 
@@ -338,7 +338,9 @@ button:hover {
 
 
 <script>
-
+function startMusic() {
+    document.getElementById("music").play();
+    }
 function go(id) {
     document.querySelectorAll('.screen')
         .forEach(s => s.classList.remove('active'));
