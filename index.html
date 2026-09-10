@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kashish's Little World 💗</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #ffd6ec, #d9d4ff);
+    overflow: hidden;
+    color: #4b3155;
+}
+
+.screen {
+    display: none;
+    min-height: 100vh;
+    width: 100%;
+    padding: 25px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    animation: fade .5s ease;
+}
+
+.screen.active {
+    display: flex;
+}
+
+@keyframes fade {
+    from {opacity:0; transform:scale(.96);}
+    to {opacity:1; transform:scale(1);}
+}
+
+h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+h2 {
+    font-size: 30px;
+    margin-bottom: 15px;
+}
+
+p {
+    font-size: 18px;
+    margin: 10px;
+}
+
+button {
+    border: none;
+    padding: 14px 25px;
+    border-radius: 30px;
+    background: #ffffff;
+    color: #8b4f8f;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 10px;
+    box-shadow: 0 7px 20px #9c669955;
+    transition: .2s;
+}
+
+button:hover {
+    transform: scale(1.08);
+}
+
+.next {
+    margin-top: 20px;
+    background: #8b4f8f;
+    color: white;
+}
+
+.card {
+    background: #ffffffaa;
+    backdrop-filter: blur(10px);
+    padding: 25px;
+    border-radius: 30px;
+    max-width: 450px;
+    width: 100%;
+    box-shadow: 0 10px 40px #8b4f8f33;
+}
+
+.emoji {
+    font-size: 70px;
+    margin: 15px;
+}
+
+/* Hearts game */
+#heartGame {
+    width: 90%;
+    height: 55vh;
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+    background: #ffffff55;
+}
+
+.heart {
+    position: absolute;
+    font-size: 35px;
+    cursor: pointer;
+    animation: fall 3s linear;
+}
+
+@keyframes fall {
+    from {top:-50px;}
+    to {top:100%;}
+}
+
+/* Boxes */
+.boxes {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.box {
+    font-size: 55px;
+    cursor: pointer;
+    padding: 20px;
+    background: white;
+    border-radius: 25px;
+    transition: .2s;
+}
+
+.box:hover {
+    transform: translateY(-8px) rotate(3deg);
+}
+
+/* Hidden hearts */
+.room {
+    position: relative;
+    width: 90%;
+    max-width: 500px;
+    height: 55vh;
+    background: #ffffff66;
+    border-radius: 30px;
+}
+
+.hidden-heart {
+    position: absolute;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#result {
+    min-height: 45px;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.small {
+    font-size: 14px;
+    opacity: .7;
+}
+
+.confetti {
+    position: fixed;
+    top: -20px;
+    font-size: 25px;
+    animation: confetti 3s linear forwards;
+}
+
+@keyframes confetti {
+    to {
+        transform: translateY(110vh) rotate(720deg);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<!-- START -->
+<section class="screen active" id="start">
+    <div class="card">
+        <div class="emoji">🎀</div>
+        <h1>Hey Kashish 💗</h1>
+        <p>A tiny little game made especially for you.</p>
+        <p class="small">No boring website. Just tap things. 😭</p>
+        <button onclick="go('hearts')">START ✨</button>
+    </div>
+</section>
+
+<!-- HEART GAME -->
+<section class="screen" id="hearts">
+    <h2>💗 Catch 10 Hearts</h2>
+    <p>Tap the falling hearts!</p>
+    <p>Score: <span id="score">0</span>/10</p>
+
+    <div id="heartGame"></div>
+
+    <button class="next" id="heartNext" onclick="go('boxes')" style="display:none;">
+        LEVEL COMPLETE → 🎁
+    </button>
+</section>
+
+<!-- BOXES -->
+<section class="screen" id="boxes">
+    <div class="card">
+        <h2>🎁 Pick a Box</h2>
+        <p>One of these has your surprise...</p>
+
+        <div class="boxes">
+            <div class="box" onclick="boxPick(1)">🎁</div>
+            <div class="box" onclick="boxPick(2)">🎀</div>
+            <div class="box" onclick="boxPick(3)">💜</div>
+        </div>
+
+        <div id="boxResult"></div>
+
+        <button class="next" onclick="go('quiz')">NEXT →</button>
+    </div>
+</section>
+
+<!-- QUIZ -->
+<section class="screen" id="quiz">
+    <div class="card">
+        <h2>🧠 Kashish Quiz</h2>
+        <p id="question">What's Kashish's default mode?</p>
+
+        <button onclick="quizAnswer('Sleepy')">😴 Sleepy</button>
+        <button onclick="quizAnswer('Chaotic')">😂 Chaotic</button>
+        <button onclick="quizAnswer('Savage')">💅 Savage</button>
+        <button onclick="quizAnswer('All')">💀 ALL</button>
+
+        <div id="quizResult"></div>
+
+        <button class="next" onclick="go('lines')">NEXT →</button>
+    </div>
+</section>
+
+<!-- PICK UP LINES -->
+<section class="screen" id="lines">
+    <div class="card">
+        <h2>💘 Pick-Up Line Generator</h2>
+        <p>Press the button. Don't blame me for the results. 😭</p>
+
+        <div id="lineResult" style="font-size:21px;min-height:100px;">
+            👀 Waiting...
+        </div>
+
+        <button onclick="generateLine()">GENERATE ✨</button>
+
+        <button class="next" onclick="go('fortune')">NEXT →</button>
+    </div>
+</section>
+
+<!-- FORTUNE -->
+<section class="screen" id="fortune">
+    <div class="card">
+        <h2>🔮 Kashish's Fortune</h2>
+
+        <div class="emoji" onclick="fortune()">🔮</div>
+
+        <p id="fortuneResult">Tap the crystal ball...</p>
+
+        <button class="next" onclick="go('bts')">NEXT →</button>
+    </div>
+</section>
+
+<!-- BTS -->
+<section class="screen" id="bts">
+    <div class="card">
+        <h2>💜 BTS Mood Match</h2>
+        <p>Pick your current mood:</p>
+
+        <button onclick="bts('RM')">🧠 RM</button>
+        <button onclick="bts('Jin')">😂 Jin</button>
+        <button onclick="bts('SUGA')">😎 SUGA</button>
+        <button onclick="bts('j-hope')">☀️ j-hope</button>
+        <button onclick="bts('Jimin')">🌸 Jimin</button>
+        <button onclick="bts('V')">🎨 V</button>
+        <button onclick="bts('Jung Kook')">🐰 Jung Kook</button>
+
+        <div id="btsResult"></div>
+
+        <button class="next" onclick="go('hidden')">NEXT →</button>
+    </div>
+</section>
+
+<!-- HIDDEN HEARTS -->
+<section class="screen" id="hidden">
+    <h2>🕵️ Find 7 Hidden Hearts</h2>
+    <p>Find them all!</p>
+
+    <div class="room" id="room"></div>
+
+    <p>Found: <span id="found">0</span>/7</p>
+
+    <button class="next" id="hiddenNext"
+            onclick="go('final')"
+            style="display:none;">
+        YOU FOUND THEM ALL → 💌
+    </button>
+</section>
+
+<!-- FINAL -->
+<section class="screen" id="final">
+    <div class="card">
+        <div class="emoji">🎁</div>
+
+        <h1>LEVEL COMPLETE 👑</h1>
+
+        <p>
+            Kashish has officially completed
+            her little digital adventure. 💗
+        </p>
+
+        <p>
+            Stay cute. Stay chaotic.
+            Stay completely YOU. 🎀
+        </p>
+
+        <p>
+            Made especially for Kashish ✨
+        </p>
+
+        <button onclick="confetti()">CELEBRATE 🎉</button>
+
+        <button class="next" onclick="go('start')">
+            PLAY AGAIN 🔄
+        </button>
+    </div>
+</section>
+
+
+<script>
+
+function go(id) {
+    document.querySelectorAll('.screen')
+        .forEach(s => s.classList.remove('active'));
+
+    document.getElementById(id)
+        .classList.add('active');
+
+    if(id === 'hearts') startHearts();
+    if(id === 'hidden') startHidden();
+}
+
+
+/* HEART GAME */
+
+let score = 0;
+let heartTimer;
+
+function startHearts() {
+
+    score = 0;
+
+    document.getElementById("score").textContent = score;
+
+    document.getElementById("heartNext").style.display = "none";
+
+    const game = document.getElementById("heartGame");
+
+    game.innerHTML = "";
+
+    clearInterval(heartTimer);
+
+    heartTimer = setInterval(() => {
+
+        if(score >= 10) {
+            clearInterval(heartTimer);
+            return;
+        }
+
+        const heart = document.createElement("div");
+
+        heart.className = "heart";
+        heart.textContent = ["💗","💜","💕","💖"][Math.floor(Math.random()*4)];
+
+        heart.style.left = Math.random()*90 + "%";
+
+        heart.onclick = () => {
+
+            score++;
+
+            document.getElementById("score").textContent = score;
+
+            heart.remove();
+
+            if(score >= 10) {
+
+                clearInterval(heartTimer);
+
+                document.getElementById("heartNext")
+                    .style.display = "inline-block";
+            }
+        };
+
+        game.appendChild(heart);
+
+        setTimeout(() => {
+            if(heart.parentElement) heart.remove();
+        }, 3000);
+
+    }, 600);
+}
+
+
+/* BOX GAME */
+
+function boxPick(number) {
+
+    const results = [
+        "✨ You unlocked: Certified Cutie!",
+        "😂 You unlocked: Maximum Chaos!",
+        "👑 You unlocked: Main Character Energy!"
+    ];
+
+    document.getElementById("boxResult").innerHTML =
+        "<p>" + results[number-1] + "</p>";
+}
+
+
+/* QUIZ */
+
+function quizAnswer(answer) {
+
+    if(answer === "All") {
+
+        document.getElementById("quizResult").innerHTML =
+            "<p>💀 CORRECT. Obviously.</p>";
+
+    } else {
+
+        document.getElementById("quizResult").innerHTML =
+            "<p>Nice try 😭 The answer is ALL.</p>";
+    }
+}
+
+
+/* PICK UP LINES */
+
+const lines = [
+
+"Are you Wi-Fi? Because you somehow make everything more interesting. 📶😂",
+
+"Are you a notification? Because everyone wants to see you pop up. 😭",
+
+"Are you a star? Because why are you stealing all the attention? ✨",
+
+"You're not Google, but somehow you have everything. 😭",
+
+"Warning: excessive cuteness detected. 🚨🎀",
+
+"Are you magic? Because this website got 10x better when you arrived. ✨"
+
+];
+
+function generateLine() {
+
+    const line =
+        lines[Math.floor(Math.random()*lines.length)];
+
+    document.getElementById("lineResult")
+        .textContent = line;
+}
+
+
+/* FORTUNE */
+
+const fortunes = [
+
+"✨ A good surprise is coming your way.",
+
+"😂 You will laugh at something extremely stupid.",
+
+"🍕 Your future contains snacks.",
+
+"👑 Main-character moment incoming.",
+
+"💗 Someone is very lucky to know you.",
+
+"🌷 Your next chapter is going to be interesting.",
+
+"💫 Something you've been waiting for will make you smile."
+
+];
+
+function fortune() {
+
+    document.getElementById("fortuneResult")
+        .textContent =
+        fortunes[Math.floor(Math.random()*fortunes.length)];
+}
+
+
+/* BTS */
+
+function bts(member) {
+
+    const messages = {
+
+        "RM":"🧠 Smart-energy activated.",
+
+        "Jin":"😂 Worldwide Funny energy activated.",
+
+        "SUGA":"😎 Zero unnecessary drama mode.",
+
+        "j-hope":"☀️ Sunshine mode activated.",
+
+        "Jimin":"🌸 Soft but powerful energy.",
+
+        "V":"🎨 Artistic main-character energy.",
+
+        "Jung Kook":"🐰 Golden energy activated."
+
+    };
+
+    document.getElementById("btsResult").innerHTML =
+        "<p>" + messages[member] + "</p>";
+}
+
+
+/* HIDDEN HEART GAME */
+
+let found = 0;
+
+function startHidden() {
+
+    found = 0;
+
+    document.getElementById("found").textContent = found;
+
+    document.getElementById("hiddenNext").style.display = "none";
+
+    const room = document.getElementById("room");
+
+    room.innerHTML = "";
+
+    for(let i=0; i<7; i++) {
+
+        const heart = document.createElement("span");
+
+        heart.className = "hidden-heart";
+
+        heart.textContent = "💗";
+
+        heart.style.left =
+            Math.random()*85 + "%";
+
+        heart.style.top =
+            Math.random()*85 + "%";
+
+        heart.onclick = () => {
+
+            if(heart.style.opacity === "0") return;
+
+            heart.style.opacity = "0";
+
+            found++;
+
+            document.getElementById("found")
+                .textContent = found;
+
+            if(found === 7) {
+
+                document.getElementById("hiddenNext")
+                    .style.display = "inline-block";
+            }
+        };
+
+        room.appendChild(heart);
+    }
+}
+
+
+/* CONFETTI */
+
+function confetti() {
+
+    const symbols = ["💗","💜","🎀","✨","🌸","🎉"];
+
+    for(let i=0;i<40;i++) {
+
+        const c = document.createElement("div");
+
+        c.className = "confetti";
+
+        c.textContent =
+            symbols[Math.floor(Math.random()*symbols.length)];
+
+        c.style.left = Math.random()*100 + "vw";
+
+        c.style.animationDelay =
+            Math.random()*1.5 + "s";
+
+        document.body.appendChild(c);
+
+        setTimeout(() => c.remove(), 4000);
+    }
+}
+
+</script>
+
+</body>
+  </html>
